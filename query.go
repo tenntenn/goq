@@ -2,6 +2,12 @@ package typequery
 
 import "go/types"
 
+var (
+	_ Query = andQuery(nil)
+	_ Query = orQuery(nil)
+	_ Query = (*notQuery)(nil)
+)
+
 type Query interface {
 	Exec(o types.Object) bool
 }
@@ -34,4 +40,18 @@ func (qs orQuery) Exec(o types.Object) bool {
 		}
 	}
 	return false
+}
+
+func Not(q Query) Query {
+	return &notQuery{
+		Query: q,
+	}
+}
+
+type notQuery struct {
+	Query
+}
+
+func (q *notQuery) Exec(o types.Object) bool {
+	return !q.Query.Exec(o)
 }
