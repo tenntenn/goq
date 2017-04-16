@@ -37,5 +37,5 @@ func methodEq(v1, v2 interface{}) bool {
 		return false
 	}
 
-	return t1.Exec(t2)
+	return t1.Match(t2)
 }

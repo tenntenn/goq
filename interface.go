@@ -7,8 +7,7 @@ import (
 )
 
 var (
-	_ TypeMatcher = (*Interface)(nil)
-	_ Query       = (*Interface)(nil)
+	_ Query = (*Interface)(nil)
 )
 
 type embededsSeq struct {
@@ -41,9 +40,10 @@ type Interface struct {
 	Embeddeds *optional.Set
 }
 
-func (q *Interface) Match(typ types.Type) bool {
+// Match implements Query.Match.
+func (q *Interface) Match(v interface{}) bool {
 
-	t, ok := typ.(*types.Interface)
+	t, ok := toType(v).(*types.Interface)
 	if !ok {
 		return false
 	}
@@ -57,11 +57,4 @@ func (q *Interface) Match(typ types.Type) bool {
 	}
 
 	return true
-}
-
-func (q *Interface) Exec(o types.Object) bool {
-	if o == nil || o.Type() == nil {
-		return false
-	}
-	return q.Match(o.Type())
 }

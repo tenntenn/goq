@@ -7,22 +7,21 @@ import (
 )
 
 var (
-	_ TypeMatcher = (*Array)(nil)
-	_ Query       = (*Array)(nil)
+	_ Query = (*Array)(nil)
 )
 
 // Array is a query for array objects.
 type Array struct {
 	// Elem is type of the elements.
-	Elem TypeMatcher
+	Elem Query
 	// Len is length of the array.
 	Len *optional.Int64
 }
 
-// Match implements Type.Match.
-func (q *Array) Match(typ types.Type) bool {
+// Match implements Query.Match.
+func (q *Array) Match(v interface{}) bool {
 
-	t, ok := typ.(*types.Array)
+	t, ok := toType(v).(*types.Array)
 	if !ok {
 		return false
 	}
@@ -36,12 +35,4 @@ func (q *Array) Match(typ types.Type) bool {
 	}
 
 	return true
-}
-
-// Exec implements Query.Exec.
-func (q *Array) Exec(o types.Object) bool {
-	if o == nil || o.Type() == nil {
-		return false
-	}
-	return q.Match(o.Type())
 }

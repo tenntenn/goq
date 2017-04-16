@@ -3,17 +3,17 @@ package goq
 import "go/types"
 
 var (
-	_ TypeMatcher = (*SliceQuery)(nil)
-	_ Query       = (*SliceQuery)(nil)
+	_ Query = (*Slice)(nil)
 )
 
-type SliceQuery struct {
-	Elem TypeMatcher
+type Slice struct {
+	Elem Query
 }
 
-func (q *SliceQuery) Match(typ types.Type) bool {
+// Match implements Query.Match.
+func (q *Slice) Match(v interface{}) bool {
 
-	t, ok := typ.(*types.Slice)
+	t, ok := toType(v).(*types.Slice)
 	if !ok {
 		return false
 	}
@@ -23,11 +23,4 @@ func (q *SliceQuery) Match(typ types.Type) bool {
 	}
 
 	return true
-}
-
-func (q *SliceQuery) Exec(o types.Object) bool {
-	if o == nil || o.Type() == nil {
-		return false
-	}
-	return q.Match(o.Type())
 }

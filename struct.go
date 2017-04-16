@@ -7,16 +7,15 @@ import (
 )
 
 var (
-	_ TypeMatcher = (*Struct)(nil)
-	_ Query       = (*Struct)(nil)
+	_ Query = (*Struct)(nil)
 )
 
 type Struct struct {
 	NumFields *optional.Int
-	Fields    []*VarQuery
+	Fields    []*Var
 }
 
-func (*Struct) hasField(typ *types.Struct, f *VarQuery) bool {
+func (*Struct) hasField(typ *types.Struct, f *Var) bool {
 	for i := 0; i < typ.NumFields(); i++ {
 		if t := f.Type; t != nil &&
 			t.Match(typ.Field(i).Type()) {
@@ -26,8 +25,8 @@ func (*Struct) hasField(typ *types.Struct, f *VarQuery) bool {
 	return false
 }
 
-func (q *Struct) Match(typ types.Type) bool {
-	t, ok := typ.(*types.Struct)
+func (q *Struct) Match(v interface{}) bool {
+	t, ok := toType(v).(*types.Struct)
 	if !ok {
 		return false
 	}
@@ -43,11 +42,4 @@ func (q *Struct) Match(typ types.Type) bool {
 	}
 
 	return true
-}
-
-func (q *Struct) Exec(o types.Object) bool {
-	if o == nil || o.Type() == nil {
-		return false
-	}
-	return q.Match(o.Type())
 }

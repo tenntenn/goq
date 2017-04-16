@@ -7,8 +7,7 @@ import (
 )
 
 var (
-	_ TypeMatcher = (*Float)(nil)
-	_ Query       = (*Float)(nil)
+	_ Query = (*Float)(nil)
 )
 
 // Float is a query for float objects.
@@ -17,10 +16,10 @@ type Float struct {
 	Size *optional.Int
 }
 
-// Match implements Type.Match.
-func (q *Float) Match(typ types.Type) bool {
+// Match implements Query.Match.
+func (q *Float) Match(v interface{}) bool {
 
-	t, ok := typ.(*types.Basic)
+	t, ok := toType(v).(*types.Basic)
 	if !ok {
 		return false
 	}

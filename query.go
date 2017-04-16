@@ -1,29 +1,27 @@
 package goq
 
-import "go/types"
-
 var (
-	_ Query = andQuery(nil)
-	_ Query = orQuery(nil)
-	_ Query = (*notQuery)(nil)
+	_ Query = and(nil)
+	_ Query = or(nil)
+	_ Query = (*not)(nil)
 )
 
 // Query is an query to search objects.
 type Query interface {
-	Exec(o types.Object) bool
+	Match(v interface{}) bool
 }
 
 // And concats queries into a query
-// which Exec returns true when all queries Exec return true.
+// which Match returns true when all queries Match return true.
 func And(qs ...Query) Query {
-	return andQuery(qs)
+	return and(qs)
 }
 
-type andQuery []Query
+type and []Query
 
-func (qs andQuery) Exec(o types.Object) bool {
+func (qs and) Match(v interface{}) bool {
 	for i := range qs {
-		if !qs[i].Exec(o) {
+		if !qs[i].Match(v) {
 			return false
 		}
 	}
@@ -31,34 +29,34 @@ func (qs andQuery) Exec(o types.Object) bool {
 }
 
 // Or concats queries into a query
-// which Exec returns false when all queries Exec return false.
+// which Match returns false when all queries Match return false.
 func Or(qs ...Query) Query {
-	return orQuery(qs)
+	return or(qs)
 }
 
-type orQuery []Query
+type or []Query
 
-func (qs orQuery) Exec(o types.Object) bool {
+func (qs or) Match(v interface{}) bool {
 	for i := range qs {
-		if qs[i].Exec(o) {
+		if qs[i].Match(v) {
 			return true
 		}
 	}
 	return false
 }
 
-// Not return a query which Exec returns true
-// if given query's Exec return false.
+// Not return a query which Match returns true
+// if given query's Match return false.
 func Not(q Query) Query {
-	return &notQuery{
+	return &not{
 		Query: q,
 	}
 }
 
-type notQuery struct {
+type not struct {
 	Query
 }
 
-func (q *notQuery) Exec(o types.Object) bool {
-	return !q.Query.Exec(o)
+func (q *not) Match(v interface{}) bool {
+	return !q.Query.Match(v)
 }

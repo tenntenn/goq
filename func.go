@@ -23,12 +23,9 @@ type Func struct {
 }
 
 // Exec implements Query.Exec.
-func (q *Func) Exec(o types.Object) bool {
-	if o == nil || o.Type() == nil {
-		return false
-	}
+func (q *Func) Match(v interface{}) bool {
 
-	f, ok := o.(*types.Func)
+	f, ok := v.(*types.Func)
 	if !ok {
 		return false
 	}

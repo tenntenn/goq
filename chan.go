@@ -7,22 +7,21 @@ import (
 )
 
 var (
-	_ TypeMatcher = (*Chan)(nil)
-	_ Query       = (*Chan)(nil)
+	_ Query = (*Chan)(nil)
 )
 
 // Chan is an query for chan objects.
 type Chan struct {
 	// Elem is type of send or receive values.
-	Elem TypeMatcher
+	Elem Query
 	// Dir is direction of the chan.
 	Dir *optional.Int
 }
 
-// Match implements Type.Match.
-func (q *Chan) Match(typ types.Type) bool {
+// Match implements Query.Match.
+func (q *Chan) Match(v interface{}) bool {
 
-	t, ok := typ.(*types.Chan)
+	t, ok := toType(v).(*types.Chan)
 	if !ok {
 		return false
 	}
@@ -36,12 +35,4 @@ func (q *Chan) Match(typ types.Type) bool {
 	}
 
 	return true
-}
-
-// Exec implements Query.Exec.
-func (q *Chan) Exec(o types.Object) bool {
-	if o == nil || o.Type() == nil {
-		return false
-	}
-	return q.Match(o.Type())
 }

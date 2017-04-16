@@ -8,44 +8,42 @@ import (
 )
 
 var (
-	_ Query = (*VarQuery)(nil)
+	_ Query = (*Var)(nil)
 )
 
-type VarQuery struct {
+type Var struct {
 	IsField   *optional.Bool
 	Name      *pattern.Pattern
 	Exported  *optional.Bool
 	Anonymous *optional.Bool
-	Type      TypeMatcher
+	Type      Query
 }
 
-func (q *VarQuery) Exec(o types.Object) bool {
-	if o == nil || o.Type() == nil {
-		return false
-	}
+// Match implements Query.Match.
+func (q *Var) Match(v interface{}) bool {
 
-	v, ok := o.(*types.Var)
+	o, ok := v.(*types.Var)
 	if !ok {
 		return false
 	}
 
-	if !q.IsField.Match(v.IsField()) {
+	if !q.IsField.Match(o.IsField()) {
 		return false
 	}
 
-	if !q.Exported.Match(v.Exported()) {
+	if !q.Exported.Match(o.Exported()) {
 		return false
 	}
 
-	if !q.Anonymous.Match(v.Anonymous()) {
+	if !q.Anonymous.Match(o.Anonymous()) {
 		return false
 	}
 
-	if !q.Name.Match(v.Name()) {
+	if !q.Name.Match(o.Name()) {
 		return false
 	}
 
-	if q.Type != nil && !q.Type.Match(v.Type()) {
+	if q.Type != nil && !q.Type.Match(o.Type()) {
 		return false
 	}
 

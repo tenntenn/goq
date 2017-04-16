@@ -17,18 +17,9 @@ type TypeName struct {
 	Pkg      *Package
 }
 
-// FIXME: remove it
-type pkg struct {
-	types.Object
-	v *types.Package
-}
-
-func (p *pkg) Pkg() *types.Package {
-	return p.v
-}
-
-func (q *TypeName) Exec(o types.Object) bool {
-	tn, ok := o.(*types.TypeName)
+// Match implements Query.Match
+func (q *TypeName) Match(v interface{}) bool {
+	tn, ok := v.(*types.TypeName)
 	if !ok {
 		return false
 	}
@@ -41,7 +32,7 @@ func (q *TypeName) Exec(o types.Object) bool {
 		return false
 	}
 
-	if !q.Pkg.Exec(&pkg{v: tn.Pkg()}) {
+	if !q.Pkg.Match(tn.Pkg()) {
 		return false
 	}
 

@@ -11,22 +11,15 @@ var (
 )
 
 type Named struct {
-	Underlying TypeMatcher
+	Underlying Query
 	Methods    *optional.Tuple
 	TypeName   *TypeName
 }
 
-func (q *Named) Exec(o types.Object) bool {
-	if o == nil {
-		return false
-	}
+// Match implemets Query.Match.
+func (q *Named) Match(v interface{}) bool {
 
-	t := o.Type()
-	if t == nil {
-		return false
-	}
-
-	n, ok := t.(*types.Named)
+	n, ok := toType(v).(*types.Named)
 	if !ok {
 		return false
 	}
@@ -39,7 +32,7 @@ func (q *Named) Exec(o types.Object) bool {
 		return false
 	}
 
-	if q.TypeName != nil && !q.TypeName.Exec(n.Obj()) {
+	if q.TypeName != nil && !q.TypeName.Match(n.Obj()) {
 		return false
 	}
 

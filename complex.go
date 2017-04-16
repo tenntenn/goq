@@ -7,8 +7,7 @@ import (
 )
 
 var (
-	_ TypeMatcher = (*Complex)(nil)
-	_ Query       = (*Complex)(nil)
+	_ Query = (*Complex)(nil)
 )
 
 // Complex is a query for float objects.
@@ -17,10 +16,10 @@ type Complex struct {
 	Size *optional.Int
 }
 
-// Match implements Type.Match.
-func (q *Complex) Match(typ types.Type) bool {
+// Match implements Query.Match.
+func (q *Complex) Match(v interface{}) bool {
 
-	t, ok := typ.(*types.Basic)
+	t, ok := toType(v).(*types.Basic)
 	if !ok {
 		return false
 	}
@@ -34,12 +33,4 @@ func (q *Complex) Match(typ types.Type) bool {
 	}
 
 	return true
-}
-
-// Exec implements Query.Exec.
-func (q *Complex) Exec(o types.Object) bool {
-	if o == nil || o.Type() == nil {
-		return false
-	}
-	return q.Match(o.Type())
 }

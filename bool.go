@@ -3,17 +3,16 @@ package goq
 import "go/types"
 
 var (
-	_ TypeMatcher = (*Bool)(nil)
-	_ Query       = (*Bool)(nil)
+	_ Query = (*Bool)(nil)
 )
 
 // Bool is a query for integer objects.
 type Bool struct{}
 
-// Match implements Type.Match.
-func (q *Bool) Match(typ types.Type) bool {
+// Match implements Query.Match.
+func (q *Bool) Match(v interface{}) bool {
 
-	t, ok := typ.(*types.Basic)
+	t, ok := toType(v).(*types.Basic)
 	if !ok {
 		return false
 	}
@@ -23,12 +22,4 @@ func (q *Bool) Match(typ types.Type) bool {
 	}
 
 	return true
-}
-
-// Exec implements Query.Exec.
-func (q *Bool) Exec(o types.Object) bool {
-	if o == nil || o.Type() == nil {
-		return false
-	}
-	return q.Match(o.Type())
 }

@@ -7,12 +7,12 @@ import (
 )
 
 var (
-	_ TypeMatcher = (*Signature)(nil)
+	_ Query = (*Signature)(nil)
 )
 
 type Signature struct {
 	// Recv is type of the receiver.
-	Recv *VarQuery
+	Recv *Var
 	// Params are parameters of the function.
 	Params *optional.Tuple
 	// Results are results of the function.
@@ -21,8 +21,9 @@ type Signature struct {
 	Variadic *optional.Bool
 }
 
-func (tm *Signature) Match(t types.Type) bool {
-	s, ok := t.(*types.Signature)
+// Match implements Query.Match.
+func (tm *Signature) Match(v interface{}) bool {
+	s, ok := toType(v).(*types.Signature)
 	if !ok {
 		return false
 	}
@@ -31,7 +32,7 @@ func (tm *Signature) Match(t types.Type) bool {
 		return false
 	}
 
-	if tm.Recv != nil && !tm.Recv.Exec(s.Recv()) {
+	if tm.Recv != nil && !tm.Recv.Match(s.Recv()) {
 		return false
 	}
 

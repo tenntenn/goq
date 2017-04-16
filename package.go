@@ -7,11 +7,19 @@ import (
 	"github.com/tenntenn/optional/pattern"
 )
 
-/*
 var (
 	_ Query = (*Package)(nil)
 )
-*/
+
+func toPackage(v interface{}) *types.Package {
+	switch v := v.(type) {
+	case *types.Package:
+		return v
+	case types.Object:
+		return v.Pkg()
+	}
+	return nil
+}
 
 type Package struct {
 	Path    *pattern.Pattern
@@ -19,12 +27,13 @@ type Package struct {
 	Imports *optional.Set
 }
 
-func (q *Package) Exec(o types.Object) bool {
-	if o == nil || o.Pkg() == nil {
+// Match implements Query.Match.
+func (q *Package) Match(v interface{}) bool {
+
+	p := toPackage(v)
+	if p == nil {
 		return false
 	}
-
-	p := o.Pkg()
 
 	if !q.Name.Match(p.Name()) {
 		return false
@@ -34,7 +43,7 @@ func (q *Package) Exec(o types.Object) bool {
 		return false
 	}
 
-	if q.Imports != nil && !q.Imports.Match(&pkgImportsSeq{v: p}) {
+	if q.Imports != nil && !q.Imports.Match(p) {
 		return false
 	}
 

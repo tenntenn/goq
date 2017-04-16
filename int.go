@@ -7,8 +7,7 @@ import (
 )
 
 var (
-	_ TypeMatcher = (*Int)(nil)
-	_ Query       = (*Int)(nil)
+	_ Query = (*Int)(nil)
 )
 
 // Int is a query for integer objects.
@@ -19,10 +18,10 @@ type Int struct {
 	Unsigned *optional.Bool
 }
 
-// Match implements Type.Match.
-func (q *Int) Match(typ types.Type) bool {
+// Match implements Query.Match.
+func (q *Int) Match(v interface{}) bool {
 
-	t, ok := typ.(*types.Basic)
+	t, ok := toType(v).(*types.Basic)
 	if !ok {
 		return false
 	}
@@ -40,12 +39,4 @@ func (q *Int) Match(typ types.Type) bool {
 	}
 
 	return true
-}
-
-// Exec implements Query.Exec.
-func (q *Int) Exec(o types.Object) bool {
-	if o == nil || o.Type() == nil {
-		return false
-	}
-	return q.Match(o.Type())
 }

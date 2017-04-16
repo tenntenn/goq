@@ -6,13 +6,13 @@ func Exec(info *types.Info, q Query) []types.Object {
 	objectSet := map[string]types.Object{}
 
 	for _, o := range info.Defs {
-		if q.Exec(o) {
+		if q.Match(o) {
 			objectSet[o.Id()] = o
 		}
 	}
 
 	for _, o := range info.Uses {
-		if q.Exec(o) {
+		if q.Match(o) {
 			objectSet[o.Id()] = o
 		}
 	}
