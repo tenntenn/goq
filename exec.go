@@ -1,26 +1,52 @@
 package goq
 
-import "go/types"
+import (
+	"go/ast"
+	"go/token"
+	"go/types"
+)
 
-func Exec(info *types.Info, q Query) []types.Object {
-	objectSet := map[string]types.Object{}
+type Result struct {
+	Node         ast.Node
+	Object       types.Object
+	TypeAndValue types.TypeAndValue
+}
 
-	for _, o := range info.Defs {
-		if q.Match(o) {
-			objectSet[o.Id()] = o
+func Exec(info *types.Info, q Query) []*Result {
+
+	resultSets := map[token.Pos]*Result{}
+
+	for i, o := range info.Defs {
+		if q.Match(o) || q.Match(i) {
+			resultSets[i.Pos()] = &Result{
+				Node:   i,
+				Object: o,
+			}
 		}
 	}
 
-	for _, o := range info.Uses {
-		if q.Match(o) {
-			objectSet[o.Id()] = o
+	for i, o := range info.Uses {
+		if q.Match(o) || q.Match(i) {
+			resultSets[i.Pos()] = &Result{
+				Node:   i,
+				Object: o,
+			}
 		}
 	}
 
-	objects := make([]types.Object, 0, len(objectSet))
-	for _, o := range objectSet {
-		objects = append(objects, o)
+	for e, tv := range info.Types {
+		if q.Match(tv) || q.Match(e) {
+			resultSets[e.Pos()] = &Result{
+				Node:         e,
+				TypeAndValue: tv,
+			}
+		}
 	}
 
-	return objects
+	results := make([]*Result, 0, len(resultSets))
+	for _, r := range resultSets {
+		results = append(results, r)
+	}
+
+	return results
 }

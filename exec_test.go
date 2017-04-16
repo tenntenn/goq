@@ -38,12 +38,12 @@ func TestExec(t *testing.T) {
 	}
 
 	q := &Int{}
-	objects := Exec(info, q)
-	if len(objects) != 1 {
-		t.Fatalf("the number of result must be 1 but %d", len(objects))
+	results := Exec(info, q)
+	if len(results) != 2 {
+		t.Fatalf("the number of result must be 2 but %d", len(results))
 	}
 
-	if n := objects[0].Name(); n != "n" {
+	if n := results[0].Object.Name(); n != "n" {
 		t.Errorf(`exepect object name is "n" but %q`, n)
 	}
 }
