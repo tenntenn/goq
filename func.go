@@ -18,7 +18,8 @@ type Func struct {
 	// FullName is full name of the function.
 	FullName *pattern.Pattern
 	// Exported is whether the function is exported or not.
-	Exported  *optional.Bool
+	Exported *optional.Bool
+	// Signature is query of signature.
 	Signature *Signature
 }
 
