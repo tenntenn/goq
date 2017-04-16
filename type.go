@@ -1,36 +1,11 @@
-package typequery
+package goq
 
 import (
-	gtypes "go/types"
-
-	"github.com/tenntenn/typequery/types"
+	types "go/types"
 )
 
-func Type(typ types.Type) *TypeQuery {
-	return &TypeQuery{
-		Type: typ,
-	}
-}
-
-type TypeQuery struct {
-	Type types.Type
-}
-
-var (
-	_ types.Type = (*TypeQuery)(nil)
-	_ Query      = (*TypeQuery)(nil)
-)
-
-func (q *TypeQuery) Check(typ gtypes.Type) bool {
-	if typ == nil {
-		return false
-	}
-	return q.Type.Check(typ) || q.Type.Check(typ.Underlying())
-}
-
-func (q *TypeQuery) Exec(o gtypes.Object) bool {
-	if o == nil || o.Type() == nil {
-		return false
-	}
-	return q.Type.Check(o.Type()) || q.Type.Check(o.Type().Underlying())
+// TypeMatcher tests whether type is matched or not.
+type TypeMatcher interface {
+	// Match returns true when given type is matched.
+	Match(t types.Type) bool
 }

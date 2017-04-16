@@ -1,26 +1,47 @@
-package typequery
+package goq
 
 import (
-	gtypes "go/types"
+	"go/types"
 
-	"github.com/tenntenn/typequery/types"
+	"github.com/tenntenn/optional"
 )
 
-func Chan(elem types.Type) *ChanQuery {
-	return &ChanQuery{
-		&types.Chan{
-			Elem: elem,
-		},
+var (
+	_ TypeMatcher = (*Chan)(nil)
+	_ Query       = (*Chan)(nil)
+)
+
+// Chan is an query for chan objects.
+type Chan struct {
+	// Elem is type of send or receive values.
+	Elem TypeMatcher
+	// Dir is direction of the chan.
+	Dir *optional.Int
+}
+
+// Match implements Type.Match.
+func (q *Chan) Match(typ types.Type) bool {
+
+	t, ok := typ.(*types.Chan)
+	if !ok {
+		return false
 	}
+
+	if !q.Dir.Match(int(t.Dir())) {
+		return false
+	}
+
+	if q.Elem != nil && !q.Match(t.Elem()) {
+		return false
+	}
+
+	return true
 }
 
-type ChanQuery struct {
-	*types.Chan
-}
-
-func (q *ChanQuery) Exec(o gtypes.Object) bool {
+// Exec implements Query.Exec.
+func (q *Chan) Exec(o types.Object) bool {
 	if o == nil || o.Type() == nil {
 		return false
 	}
-	return q.Chan.Check(o.Type())
+	return q.Match(o.Type())
 }

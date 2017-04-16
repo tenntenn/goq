@@ -1,4 +1,4 @@
-package typequery
+package goq
 
 import "go/types"
 

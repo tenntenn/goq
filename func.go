@@ -1,51 +1,49 @@
-package typequery
+package goq
 
 import (
-	gtypes "go/types"
+	"go/types"
 
-	"github.com/tenntenn/typequery/option"
-	"github.com/tenntenn/typequery/types"
+	"github.com/tenntenn/optional"
+	"github.com/tenntenn/optional/pattern"
 )
-
-func Func(name string) *FuncQuery {
-	return &FuncQuery{
-		Name: &option.Parttern{Value: &name},
-	}
-}
-
-type FuncQuery struct {
-	*types.Func
-	Name     *option.Parttern
-	FullName *option.Parttern
-	Exported *bool
-}
 
 var (
-	_ types.Type = (*FuncQuery)(nil)
-	_ Query      = (*FuncQuery)(nil)
+	_ Query = (*Func)(nil)
 )
 
-func (q *FuncQuery) Exec(o gtypes.Object) bool {
+// Func is a query for function objects.
+type Func struct {
+	// Name is name of the function.
+	Name *pattern.Pattern
+	// FullName is full name of the function.
+	FullName *pattern.Pattern
+	// Exported is whether the function is exported or not.
+	Exported  *optional.Bool
+	Signature *Signature
+}
+
+// Exec implements Query.Exec.
+func (q *Func) Exec(o types.Object) bool {
 	if o == nil || o.Type() == nil {
 		return false
 	}
 
-	f, ok := o.(*gtypes.Func)
+	f, ok := o.(*types.Func)
 	if !ok {
 		return false
 	}
 
-	if !option.Has(q.Exported, f.Exported()) {
+	if !q.Exported.Match(f.Exported()) {
 		return false
 	}
 
-	if !option.Has(q.Name, f.Name()) {
+	if !q.Name.Match(f.Name()) {
 		return false
 	}
 
-	if !option.Has(q.FullName, f.FullName()) {
+	if !q.FullName.Match(f.FullName()) {
 		return false
 	}
 
-	return q.Func.Check(f.Type())
+	return q.Signature.Match(f.Type())
 }

@@ -1,4 +1,4 @@
-package typequery_test
+package goq_test
 
 import (
 	"go/ast"
@@ -8,7 +8,7 @@ import (
 	"go/types"
 	"testing"
 
-	. "github.com/tenntenn/typequery"
+	. "github.com/tenntenn/goq"
 )
 
 func TestExec(t *testing.T) {
@@ -37,7 +37,7 @@ func TestExec(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	q := Int(nil)
+	q := &Int{}
 	objects := Exec(info, q)
 	if len(objects) != 1 {
 		t.Fatalf("the number of result must be 1 but %d", len(objects))

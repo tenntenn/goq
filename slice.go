@@ -1,26 +1,33 @@
-package typequery
+package goq
 
-import (
-	gtypes "go/types"
+import "go/types"
 
-	"github.com/tenntenn/typequery/types"
+var (
+	_ TypeMatcher = (*SliceQuery)(nil)
+	_ Query       = (*SliceQuery)(nil)
 )
 
-func Slice(elem types.Type) *SliceQuery {
-	return &SliceQuery{
-		&types.Slice{
-			Elem: elem,
-		},
-	}
-}
-
 type SliceQuery struct {
-	*types.Slice
+	Elem TypeMatcher
 }
 
-func (q *SliceQuery) Exec(o gtypes.Object) bool {
+func (q *SliceQuery) Match(typ types.Type) bool {
+
+	t, ok := typ.(*types.Slice)
+	if !ok {
+		return false
+	}
+
+	if q.Elem != nil && !q.Elem.Match(t.Elem()) {
+		return false
+	}
+
+	return true
+}
+
+func (q *SliceQuery) Exec(o types.Object) bool {
 	if o == nil || o.Type() == nil {
 		return false
 	}
-	return q.Slice.Check(o.Type())
+	return q.Match(o.Type())
 }

@@ -1,51 +1,53 @@
-package typequery
+package goq
 
 import (
-	gtypes "go/types"
+	"go/types"
 
-	"github.com/tenntenn/typequery/option"
-	"github.com/tenntenn/typequery/types"
+	"github.com/tenntenn/optional"
+	"github.com/tenntenn/optional/pattern"
 )
-
-func Var(name string) *VarQuery {
-	return &VarQuery{
-		Name: &option.Parttern{Value: &name},
-	}
-}
-
-type VarQuery struct {
-	types.Type
-	Name     *option.Parttern
-	Package  *PackageQuery
-	Exported *bool
-}
 
 var (
-	_ types.Type = (*VarQuery)(nil)
-	_ Query      = (*VarQuery)(nil)
+	_ Query = (*VarQuery)(nil)
 )
 
-func (q *VarQuery) Exec(o gtypes.Object) bool {
+type VarQuery struct {
+	IsField   *optional.Bool
+	Name      *pattern.Pattern
+	Exported  *optional.Bool
+	Anonymous *optional.Bool
+	Type      TypeMatcher
+}
+
+func (q *VarQuery) Exec(o types.Object) bool {
 	if o == nil || o.Type() == nil {
 		return false
 	}
 
-	v, ok := o.(*gtypes.Var)
+	v, ok := o.(*types.Var)
 	if !ok {
 		return false
 	}
 
-	if v.IsField() {
+	if !q.IsField.Match(v.IsField()) {
 		return false
 	}
 
-	if !option.Has(q.Exported, v.Exported()) {
+	if !q.Exported.Match(v.Exported()) {
 		return false
 	}
 
-	if !option.Has(q.Name, v.Name()) {
+	if !q.Anonymous.Match(v.Anonymous()) {
 		return false
 	}
 
-	return q.Type.Check(v.Type())
+	if !q.Name.Match(v.Name()) {
+		return false
+	}
+
+	if q.Type != nil && !q.Type.Match(v.Type()) {
+		return false
+	}
+
+	return true
 }

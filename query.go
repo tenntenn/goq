@@ -1,4 +1,4 @@
-package typequery
+package goq
 
 import "go/types"
 
@@ -8,10 +8,13 @@ var (
 	_ Query = (*notQuery)(nil)
 )
 
+// Query is an query to search objects.
 type Query interface {
 	Exec(o types.Object) bool
 }
 
+// And concats queries into a query
+// which Exec returns true when all queries Exec return true.
 func And(qs ...Query) Query {
 	return andQuery(qs)
 }
@@ -27,6 +30,8 @@ func (qs andQuery) Exec(o types.Object) bool {
 	return true
 }
 
+// Or concats queries into a query
+// which Exec returns false when all queries Exec return false.
 func Or(qs ...Query) Query {
 	return orQuery(qs)
 }
@@ -42,6 +47,8 @@ func (qs orQuery) Exec(o types.Object) bool {
 	return false
 }
 
+// Not return a query which Exec returns true
+// if given query's Exec return false.
 func Not(q Query) Query {
 	return &notQuery{
 		Query: q,
