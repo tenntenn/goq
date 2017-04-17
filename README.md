@@ -23,15 +23,16 @@ func run() error {
 		Uses: map[*ast.Ident]types.Object{},
 	}
 
-	if _, err := config.Check("main", fset, []*ast.File{f}, info); err != nil {
+    files := []*ast.File{f}
+	if _, err := config.Check("main", fset, files, info); err != nil {
 		return err
 	}
 
-	q := Int(nil)
-	objects := Exec(info, q)
-    for _, o := range objects {
-        fmt.Println(o, "at", fset.Pos(o.Pos()))
+    results := goq.New(fset, info, files).Query(&Int{})
+    for _, r := range results {
+        fmt.Println(r.Object, "at", fset.Pos(r.Node.Pos()))
     }
+
     return nil
 }
 
