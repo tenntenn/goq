@@ -10,7 +10,6 @@ import (
 	"testing"
 
 	. "github.com/tenntenn/goq"
-	"github.com/tenntenn/optional"
 )
 
 func TestExec(t *testing.T) {
@@ -89,19 +88,7 @@ func TestError(t *testing.T) {
 
 	errorType := types.Universe.Lookup("error").Type()
 	results := New(fset, []*ast.File{f}, info).Query(&Signature{
-		Results: optional.NewTupple(nil, func(v1, v2 interface{}) bool {
-			q, ok := v1.(Query)
-			if !ok {
-				return false
-			}
-
-			v, ok := v2.(*types.Var)
-			if !ok {
-				return false
-			}
-
-			return q.Match(v)
-		}).Put(-1, &Var{
+		Results: NewTupple(nil).Put(-1, &Var{
 			Type: And(&Type{
 				Implements: errorType,
 			}, Not(&Type{
