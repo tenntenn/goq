@@ -64,9 +64,17 @@ type signatureResultsSeq struct {
 }
 
 func (s signatureResultsSeq) At(i int) interface{} {
-	return s.v.Results().At(i)
+	rs := s.v.Results()
+	if rs == nil {
+		return nil
+	}
+	return rs.At(i)
 }
 
 func (s signatureResultsSeq) Len() int {
-	return s.v.Results().Len()
+	rs := s.v.Results()
+	if rs == nil {
+		return 0
+	}
+	return rs.Len()
 }

@@ -43,7 +43,7 @@ func (q *Var) Match(v interface{}) bool {
 		return false
 	}
 
-	if q.Type != nil && !q.Type.Match(o.Type()) {
+	if q.Type != nil && !q.Type.Match(o) {
 		return false
 	}
 
