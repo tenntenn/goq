@@ -7,6 +7,7 @@ import (
 	"go/parser"
 	"go/token"
 	"go/types"
+	"reflect"
 	"testing"
 
 	. "github.com/tenntenn/goq"
@@ -83,7 +84,8 @@ func TestError(t *testing.T) {
 		Types: map[ast.Expr]types.TypeAndValue{},
 	}
 
-	if _, err := config.Check("main", fset, []*ast.File{f}, info); err != nil {
+	files := []*ast.File{f}
+	if _, err := config.Check("main", fset, files, info); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
@@ -96,7 +98,27 @@ func TestError(t *testing.T) {
 				Identical: errorType,
 			})),
 		}),
-	})
+	}).Filter(Or(&Node{
+		Files: files,
+		Path: []Query{
+			&Node{
+				Type: reflect.TypeOf((*ast.CallExpr)(nil)),
+			},
+			&Node{
+				Type: reflect.TypeOf((*ast.FuncLit)(nil)),
+			},
+		},
+	}, &Node{
+		Files: files,
+		Path: []Query{
+			&Node{
+				Type: reflect.TypeOf((*ast.FuncDecl)(nil)),
+			},
+			&Node{
+				Type: reflect.TypeOf((*ast.Ident)(nil)),
+			},
+		},
+	}))
 
 	/*
 		if len(results) != 2 {
