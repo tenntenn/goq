@@ -1,7 +1,6 @@
 package goq_test
 
 import (
-	"fmt"
 	"go/ast"
 	"go/importer"
 	"go/parser"
@@ -120,18 +119,15 @@ func TestError(t *testing.T) {
 		},
 	}))
 
-	/*
-		if len(results) != 2 {
-			t.Fatalf("the number of result must be 2 but %d", len(results))
-		}
-	*/
-
-	for _, r := range results {
-		fmt.Println(fset.Position(r.Node.Pos()))
+	if len(results) != 2 {
+		t.Fatalf("the number of result must be 2 but %d", len(results))
 	}
-	/*
-		if n := results[0].Object.Name(); n != "n" {
-			t.Errorf(`exepect object name is "n" but %q`, n)
-		}
-	*/
+
+	if pos := results[0].Node.Pos(); fset.Position(pos).Line != 4 {
+		t.Errorf(`exepect first line is 4 but %d`, fset.Position(pos).Line)
+	}
+
+	if pos := results[1].Node.Pos(); fset.Position(pos).Line != 9 {
+		t.Errorf(`exepect first line is 9 but %d`, fset.Position(pos).Line)
+	}
 }
