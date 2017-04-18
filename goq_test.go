@@ -101,9 +101,6 @@ func TestError(t *testing.T) {
 		Files: files,
 		Path: []Query{
 			&Node{
-				Type: reflect.TypeOf((*ast.CallExpr)(nil)),
-			},
-			&Node{
 				Type: reflect.TypeOf((*ast.FuncLit)(nil)),
 			},
 		},
