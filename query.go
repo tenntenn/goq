@@ -1,6 +1,7 @@
 package goq
 
 var (
+	_ Query = (*queryFunc)(nil)
 	_ Query = and(nil)
 	_ Query = or(nil)
 	_ Query = (*not)(nil)
@@ -9,6 +10,19 @@ var (
 // Query is an query to search objects.
 type Query interface {
 	Match(v interface{}) bool
+}
+
+type queryFunc struct {
+	f func(v interface{}) bool
+}
+
+func (q *queryFunc) Match(v interface{}) bool {
+	return q.f(v)
+}
+
+// QueryFunc returns a Query which uses f.
+func QueryFunc(f func(v interface{}) bool) Query {
+	return &queryFunc{f: f}
 }
 
 // And concats queries into a query
