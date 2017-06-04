@@ -1,4 +1,25 @@
-# Go Query
+# goq [![Go Documentation](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)][godoc] [![Travis](https://img.shields.io/travis/tenntenn/goq.svg?style=flat-square)][travis]
+
+[godoc]: http://godoc.org/github.com/tenntenn/goq
+[travis]: https://travis-ci.org/tenntenn/goq
+
+`goq` is a Go package to access nodes of Go's AST by queries.
+
+See usage and example in [GoDoc](https://godoc.org/github.com/tenntenn/goq).
+
+*NOTE*: This package is experimental and may make backward-incompatible changes.
+
+## Install
+
+Use go get:
+
+```
+$ go get github.com/tenntenn/goq
+```
+
+## Usage
+
+All usage are described in [GoDoc](https://godoc.org/github.com/tenntenn/goq).
 
 ```
 const src = `package main
